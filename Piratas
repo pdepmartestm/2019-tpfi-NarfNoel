@@ -1,0 +1,50 @@
+valor brujula = 10000
+valor frascoDeArena = 0
+valor cajitaMusical = 1
+valor doblones = 100
+valor frascoDeArena2 = 1
+valor oro = 10000
+valor sombrero = 10
+valor cofre = 1000
+valor perlaNegra = 100000
+valor monedaCofreMuerto = 100
+valor espadaHierro = 50
+valor cuchillo = 5
+valor botellaRon = 25
+valor joyas = 250
+valor medias = 1
+valor amuleto = 5000
+
+esValioso tesoro = valor tesoro >100
+
+tesoros JackSparrow = (brujula,frascoDeArena)
+tesoros DavidJones = (cajitaMusical)
+tesoros AnneBonny = (doblones, frascoDeArena2)
+tesoros ElizabethSwann = (monedaCofreMuerto, espadaHierro)
+tesoros WillTurner = (cuchillo)
+
+tesoros IslaTortuga = (frascoDeArena2)
+tesoros IslaDelRon = (botellaRon)
+tesoros CiudadGrande = (oro, sombrero, cofre, perlaNegra, botellaRon, joyas, medias)
+tesoros CiudadChica= (oro, medias, amuleto)
+
+
+saqueoValioso lugarOPersona = filter esValioso (tesoros lugarOPersona)
+saqueoEspecífico x = filter head = x tesorosVarios ???
+saqueoCorazon ???
+saqueoComplejo = saqueoValioso saqueoEspecífico ???
+
+saquear pirata forma tesoro = tesoros pirata ++ forma
+
+tripulacion PerlaNegra = (JackSparrow,AnneBonny)
+tripulacion HolandesErrante = (DavidJones)
+
+formaDeSaqueo PerlaNegra = saqueoValioso
+formaDeSaqueo HolandesErrante = saqueoCorazon
+
+pirataMas barco = tripulacion barco ++ pirata
+pirataMenos barco = ???
+
+anclarIsla barco isla =  ???
+anclarCiudad barco ciudad = ???
+abordar barco =???
