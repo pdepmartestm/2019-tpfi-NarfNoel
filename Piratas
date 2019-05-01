@@ -1,50 +1,75 @@
-valor brujula = 10000
-valor frascoDeArena = 0
-valor cajitaMusical = 1
-valor doblones = 100
-valor frascoDeArena2 = 1
-valor oro = 10000
-valor sombrero = 10
-valor cofre = 1000
-valor perlaNegra = 100000
-valor monedaCofreMuerto = 100
-valor espadaHierro = 50
-valor cuchillo = 5
-valor botellaRon = 25
-valor joyas = 250
-valor medias = 1
-valor amuleto = 5000
-
-esValioso tesoro = valor tesoro >100
-
-tesoros JackSparrow = (brujula,frascoDeArena)
-tesoros DavidJones = (cajitaMusical)
-tesoros AnneBonny = (doblones, frascoDeArena2)
-tesoros ElizabethSwann = (monedaCofreMuerto, espadaHierro)
-tesoros WillTurner = (cuchillo)
-
-tesoros IslaTortuga = (frascoDeArena2)
-tesoros IslaDelRon = (botellaRon)
-tesoros CiudadGrande = (oro, sombrero, cofre, perlaNegra, botellaRon, joyas, medias)
-tesoros CiudadChica= (oro, medias, amuleto)
+brujula = ("Brujula" ,10000)
+frascoDeArena = ("Frasco De Arena",0)
+cajitaMusical = ("Cajita Musical",1)
+doblones = ("Doblones",100)
+frascoDeArena2 = ("Frasco De Arena",1)
+oro = ("Oro" ,10000)
+sombrero = ("Sombrero",10)
+cofre = ("Cofre",100)
+perla = ("Perla",100000)
+monedaCofreMuerto = ("Moneda del Cofre Muerto",100)
+espadaHierro = ("Espada de Hierro",50)
+cuchillo = ("Cuchillo",5)
+botellaRon = ("Botella de Ron",250)
+joyas = ("Joyas",250)
+medias = ("Medias",1)
+amuleto = ("Amuleto",5000)
 
 
-saqueoValioso lugarOPersona = filter esValioso (tesoros lugarOPersona)
-saqueoEspecífico x = filter head = x tesorosVarios ???
-saqueoCorazon ???
-saqueoComplejo = saqueoValioso saqueoEspecífico ???
+jackSparrow = ("Jack Sparrow", [brujula,frascoDeArena])
+davidJones = ("David Jones" , [cajitaMusical])
+anneBonny = ("Anne Bonny" , [doblones, frascoDeArena2])
+elizabethSwann = ("Elizabeth Swann" ,[monedaCofreMuerto, espadaHierro])
+willTurner = ("Will Turner",[cuchillo])
 
-saquear pirata forma tesoro = tesoros pirata ++ forma
 
-tripulacion PerlaNegra = (JackSparrow,AnneBonny)
-tripulacion HolandesErrante = (DavidJones)
+islaTortuga = ("Isla Tortuga",[frascoDeArena2])
+islaDelRon = ("Isla del Ron",[botellaRon])
+ciudadGrande = ([oro, sombrero, cofre, perla, botellaRon, joyas, medias])
+ciudadChica= ([oro])
 
-formaDeSaqueo PerlaNegra = saqueoValioso
-formaDeSaqueo HolandesErrante = saqueoCorazon
 
-pirataMas barco = tripulacion barco ++ pirata
-pirataMenos barco = ???
+esValioso (a,b) = b>100
+noEsValioso (a,b) = b<=100
+cantTesorosPirata (a,b)= length b
+esAfortunadoPirata (a,b)= sum(map snd b)>=10000
+nuevoTesoroPirata (a,b) tesoro = b ++ [tesoro]
+pierdeValiosoPirata (a,b)= filter noEsValioso b
+noTienenMismoNombre (a,b) tesoroBuscado = (fst b) /= tesoroBuscado
+tieneElTesoro (a,b) nombreTesoro= elem nombreTesoro (map fst b)
+pierdeEspecifPirata (a,b) nombre = filter (noTienenMismoNombre nombre) b
+mismoTesoroValDifPirata1Pirata2 (a,b) (c,d) nombreTesoro = tieneElTesoro (a,b) nombreTesoro && tieneElTesoro (c,d) nombreTesoro && (filter (==nombreTesoro) (map fst b)) == (filter (==nombreTesoro) (map fst d))
 
-anclarIsla barco isla =  ???
-anclarCiudad barco ciudad = ???
-abordar barco =???
+saqueoValiosoPirataTesoro (a,b) tesoro = b++ filter esValioso [tesoro] 
+saqueoCorazon (a,b) c = b 
+saqueoEspecíficoPirata nombre (a,b) tesoro
+ | (fst tesoro == nombre) = nuevoTesoroPirata (a,b) tesoro
+ | otherwise = b
+
+saqueoComplejo pirata nombre tesoro
+ | esValioso tesoro = saqueoValiosoPirataTesoro pirata tesoro 
+ | otherwise = saqueoEspecíficoPirata nombre pirata tesoro 
+
+
+saquear pirata forma tesoro = forma pirata tesoro
+
+perlaNegra = (saqueoValiosoPirataTesoro,[jackSparrow, anneBonny])
+holandesErrante = (saqueoEspecíficoPirata "Oro",[davidJones])
+
+
+pirataMas barco pirata = snd barco ++ [pirata]
+pirataMenos barco pirata = filter (/=pirata) (snd barco)
+
+anclarIsla (a,piratas) (c,d) =  zip (map fst piratas) (map (++d) (map snd piratas))
+anclarCiudad (forma, tripulacion) ciudad = zip (map fst tripulacion) (zipWith (forma) tripulacion ciudad)
+ 
+abordarBarco (forma1,piratas1) (forma2,piratas2)
+ | (length piratas1) > (length piratas2) = anclarCiudad (forma1, piratas1) (concat(map snd piratas2))
+ | (length piratas2) > (length piratas1) = anclarCiudad (forma2, piratas2) (concat(map snd piratas1))
+ | otherwise = piratas1 ++ piratas2 
+ 
+
+
+-- Funciones de Saqueo que funcionan por sí mismas:
+saqueoValiosoPirataLugar (a,b) (c,d) = b ++ filter esValioso d
+saqueoEspecífPirataLugarTesoro (a,b) (c,d) h = b++ filter (==h) d
