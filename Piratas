@@ -1,3 +1,7 @@
+type Tesoro = (String,Int)
+type Pirata = (String,[Tesoro])
+
+
 brujula = ("Brujula" ,10000)
 frascoDeArena = ("Frasco De Arena",0)
 cajitaMusical = ("Cajita Musical",1)
@@ -30,10 +34,13 @@ ciudadChica= ([oro])
 
 
 esValioso (a,b) = b>100
-noEsValioso (a,b) = b<=100
+noEsValioso = not.esValioso
+-- noEsValioso (a,b) = b<=100
 cantTesorosPirata (a,b)= length b
 esAfortunadoPirata (a,b)= sum(map snd b)>=10000
-nuevoTesoroPirata (a,b) tesoro = b ++ [tesoro]
+
+nuevoTesoroPirata:: Pirata -> Tesoro -> Pirata
+nuevoTesoroPirata (nombre,botin) tesoro = (nombre, botin ++ [tesoro])
 pierdeValiosoPirata (a,b)= filter noEsValioso b
 noTienenMismoNombre (a,b) tesoroBuscado = (fst b) /= tesoroBuscado
 tieneElTesoro (a,b) nombreTesoro= elem nombreTesoro (map fst b)
@@ -41,18 +48,34 @@ pierdeEspecifPirata (a,b) nombre = filter (noTienenMismoNombre nombre) b
 mismoTesoroValDifPirata1Pirata2 (a,b) (c,d) nombreTesoro = tieneElTesoro (a,b) nombreTesoro && tieneElTesoro (c,d) nombreTesoro && (filter (==nombreTesoro) (map fst b)) == (filter (==nombreTesoro) (map fst d))
 
 saqueoValiosoPirataTesoro (a,b) tesoro = b++ filter esValioso [tesoro] 
-saqueoCorazon (a,b) c = b 
-saqueoEspecíficoPirata nombre (a,b) tesoro
- | (fst tesoro == nombre) = nuevoTesoroPirata (a,b) tesoro
- | otherwise = b
+
+saqueoCorazon:: Saqueo
+--saqueoCorazon:: Tesoro->Bool
+saqueoCorazon tesoro = False 
+
+saqueoEspecifico:: String -> Tesoro -> Bool
+saqueoEspecifico nombre tesoro = fst tesoro == nombre
 
 saqueoComplejo pirata nombre tesoro
  | esValioso tesoro = saqueoValiosoPirataTesoro pirata tesoro 
  | otherwise = saqueoEspecíficoPirata nombre pirata tesoro 
 
+type Saqueo = Tesoro -> Bool
 
-saquear pirata forma tesoro = forma pirata tesoro
+saqueoComplejo:: [Saqueo] -> Tesoro -> Bool
+saqueoComplejo saqueos tesoro = any (queSeCumpla tesoro) saqueos
 
+queSeCumpla :: Tesoro -> Saqueo -> Bool
+queSeCumpla tesoro saqueo = saqueo tesoro
+
+--saquear jack  (saqueoComplejo [saqueoEspecifico "rubi", saqueoEspecico "diamantes", saqueoCorazon ] ) oro
+
+saquear pirata forma tesoro 
+ | forma tesoro = nuevoTesoroPirata tesoro pirata
+ | otherwise = pirata
+ 
+ 
+  
 perlaNegra = (saqueoValiosoPirataTesoro,[jackSparrow, anneBonny])
 holandesErrante = (saqueoEspecíficoPirata "Oro",[davidJones])
 
@@ -60,8 +83,8 @@ holandesErrante = (saqueoEspecíficoPirata "Oro",[davidJones])
 pirataMas barco pirata = snd barco ++ [pirata]
 pirataMenos barco pirata = filter (/=pirata) (snd barco)
 
-anclarIsla (a,piratas) (c,d) =  zip (map fst piratas) (map (++d) (map snd piratas))
-anclarCiudad (forma, tripulacion) ciudad = zip (map fst tripulacion) (zipWith (forma) tripulacion ciudad)
+anclarIsla (forma,piratas) tesoro =  (forma, map (nuevoTesoroPirata tesoro) piratas)
+anclarCiudad (forma, tripulacion) ciudad = (forma, zipWith (forma) tripulacion ciudad)
  
 abordarBarco (forma1,piratas1) (forma2,piratas2)
  | (length piratas1) > (length piratas2) = anclarCiudad (forma1, piratas1) (concat(map snd piratas2))
